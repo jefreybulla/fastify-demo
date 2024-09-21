@@ -1,8 +1,23 @@
 async function routes (fastify, options) {
     const collection = fastify.mongo.db.collection('test_collection')
-  
-    fastify.get('/', async (request, reply) => {
-      return { hello: 'world' }
+
+    // by adding a response schema, we can make sure that the response is always in the expected format and that we are not leaking information
+    const opts = {
+        schema: {
+          response: {
+            200: {
+              type: 'object',
+              properties: {
+                hello: { type: 'string' }
+              }
+            }
+          }
+        }
+    }
+
+    fastify.get('/', opts, async (request, reply) => {
+      return { hello: 'world', db: 'test_database' }  
+      // db: 'test_database' will not be returned because it is not in the response schema  
     })
   
     fastify.get('/animals', async (request, reply) => {
@@ -20,12 +35,17 @@ async function routes (fastify, options) {
       }
       return result
     })
-  
+    
+    // Request data validation
     const animalBodyJsonSchema = {
       type: 'object',
       required: ['animal'],
       properties: {
         animal: { type: 'string' },
+        age: { type: 'number' },
+        favoriteSnacks: {
+          type: 'array'
+        }
       },
     }
   
@@ -34,9 +54,13 @@ async function routes (fastify, options) {
     }
   
     fastify.post('/animals', { schema }, async (request, reply) => {
-      // we can use the `request.body` object to get the data sent by the client
-      const result = await collection.insertOne({ animal: request.body.animal })
-      return result
+        // Fastify parses 'application/json' and 'text/plain' request payloads natively
+        console.log(request.body)
+        console.log(request.body.animal)
+        console.log(request.body.age)
+        // we can use the `request.body` object to get the data sent by the client
+        const result = await collection.insertOne({ animal: request.body.animal, age: request.body.age, favoriteSnacks: request.body.favoriteSnacks })
+        return result
     })
 }
 
