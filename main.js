@@ -1,8 +1,6 @@
-// Require the framework and instantiate it
-
-// ESM
 import Fastify from 'fastify'
 import routes from './routes.js'
+import dbConnector from './our-db-connector.js'
 
 const fastify = Fastify({
   logger: true
@@ -15,10 +13,10 @@ fastify.get('/', function (request, reply) {
 })
 */
 
+fastify.register(dbConnector)
+
 // use route from routes.js
 fastify.register(routes)
-
-
 
 
 // Run the server!
