@@ -2,15 +2,24 @@
 
 // ESM
 import Fastify from 'fastify'
+import routes from './routes.js'
 
 const fastify = Fastify({
   logger: true
 })
 
 // Declare a route
+/*
 fastify.get('/', function (request, reply) {
-  reply.send({ hello: 'world!' })
+  reply.send({ hello: 'world!!' })
 })
+*/
+
+// use route from routes.js
+fastify.register(routes)
+
+
+
 
 // Run the server!
 fastify.listen({ port: 3000 }, function (err, address) {
