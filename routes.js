@@ -48,9 +48,34 @@ async function routes (fastify, options) {
         }
       },
     }
+    const myQuerySchema = {
+      query: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          excitement: { type: 'integer' }
+        }
+      },
+    }
+
+    fastify.get('/q', {myQuerySchema} ,async (request, reply) => {
+      console.log('query ->>')
+      console.log(request.query)
+      reply
+      .code(200)
+      .header('Content-Type', 'application/json; charset=utf-8')
+      .send({ your_query: request.query })
+    })
   
     const schema = {
       body: animalBodyJsonSchema,
+      query: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          excitement: { type: 'integer' }
+        }
+      },
     }
   
     fastify.post('/animals', { schema }, async (request, reply) => {
@@ -58,6 +83,8 @@ async function routes (fastify, options) {
         console.log(request.body)
         console.log(request.body.animal)
         console.log(request.body.age)
+        console.log('query ->>')
+        console.log(request.query)
         // we can use the `request.body` object to get the data sent by the client
         const result = await collection.insertOne({ animal: request.body.animal, age: request.body.age, favoriteSnacks: request.body.favoriteSnacks })
         return result
